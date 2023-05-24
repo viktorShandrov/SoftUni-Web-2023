@@ -9,6 +9,7 @@ expressConfig(server);
 handlebarsConfig(server);
 
 server.use(homeController);
+server.use("/cubes",homeController);
 
 
 server.listen(5000,()=>console.log("Server is listening on port 5000..."))
