@@ -8,7 +8,7 @@ exports.register = function(username,password,repass){
     User.create({username,password,repass})
 }
 exports.login = async function(username,password){
-    const user = await User.findOne({username})
+    const user = await User.findOne({username}).lean()
     if(!user){
         throw new mongoose.MongooseError("No such username")
     }

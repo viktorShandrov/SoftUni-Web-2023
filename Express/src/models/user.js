@@ -13,4 +13,4 @@ schema.virtual("repass").set(function(value){
 schema.pre("save",async function(){
     this.password = await bcrypt.hash(this.password,5);
 })
-exports.User = mongoose.model("User",schema)
+module.exports = mongoose.model("User",schema)
