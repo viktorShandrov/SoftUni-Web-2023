@@ -21,5 +21,8 @@ router.get("/details/:id", async(req,res)=>{
         res.render("details",{cube});
     }
 })
+router.get("/edit/:id",(req,res)=>{
+    res.render("edit")
+})
 
 module.exports = router
