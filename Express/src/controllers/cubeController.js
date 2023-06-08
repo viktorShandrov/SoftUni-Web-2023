@@ -1,5 +1,6 @@
 const express = require("express");
-const cubeManager = require("../managers/cubeManager")
+const cubeManager = require("../managers/cubeManager");
+
 
 
 const router = express.Router();
@@ -21,8 +22,16 @@ router.get("/details/:id", async(req,res)=>{
         res.render("details",{cube});
     }
 })
-router.get("/edit/:id",(req,res)=>{
-    res.render("edit")
+router.get("/edit/:id",async(req,res)=>{
+    const cube = await cubeManager.getById(req.params.id);
+    const options = cubeManager.showSelectedOption(cube.difficultyLevel)
+    res.render("edit",{cube,options})
+})
+router.post("/edit/:id",async(req,res)=>{
+    const {name, description ,imageUrl , difficultyLevel} = req.body;
+    const id = req.params.id
+    await cubeManager.update(id,name, description ,imageUrl , difficultyLevel)
+    res.redirect("/")
 })
 
 module.exports = router
