@@ -1,36 +1,59 @@
 const express = require("express");
 const cubeManager = require("../managers/cubeManager");
+const { isAuth, isCubeOwner } = require("../middlewares/authMiddleware");
 
 
 
 const router = express.Router();
 
-router.get("/create",(req,res)=>{
+router.get("/create",isAuth,(req,res)=>{
     res.render("create");
 })
-router.post("/create",(req,res)=>{
+router.post("/create",isAuth,async(req,res)=>{
     const {name,description,imageUrl,difficultyLevel} = req.body;
-    cubeManager.create(name,description,imageUrl,difficultyLevel)
+    const owner = req.user.id
+    await cubeManager.create(name,description,imageUrl,difficultyLevel,owner)
     res.redirect("/")
 })
-router.get("/details/:id", async(req,res)=>{
-    const id = req.params.id;
-    const cube = await cubeManager.getById(id);
-    if(!cube){
-        res.redirect("/404")
-    }else{
-        res.render("details",{cube});
+router.get("/details/:_id",isCubeOwner, async(req,res)=>{
+    try {
+        const id = req.params._id;
+        const cube = await cubeManager.getById(id).lean();
+        if(!cube){
+            res.redirect("/404")
+        }else{
+            res.render("details",{cube});
+        }
+        
+    } catch (error) {
+        console.log(error.message);
     }
 })
-router.get("/edit/:id",async(req,res)=>{
-    const cube = await cubeManager.getById(req.params.id);
-    const options = cubeManager.showSelectedOption(cube.difficultyLevel)
-    res.render("edit",{cube,options})
+router.get("/edit/:_id",isAuth,isCubeOwner,async(req,res)=>{
+    if(res.isOwner){
+        const cube = await cubeManager.getById(req.params._id);
+        const options = cubeManager.showSelectedOption(cube.difficultyLevel)
+        res.render("edit",{cube,options})
+    }else{
+        res.redirect("/404")
+    }
 })
-router.post("/edit/:id",async(req,res)=>{
+router.post("/edit/:_id",isAuth,isCubeOwner,async(req,res)=>{
+    if(res.isOwner){
     const {name, description ,imageUrl , difficultyLevel} = req.body;
-    const id = req.params.id
+    const id = req.params._id
     await cubeManager.update(id,name, description ,imageUrl , difficultyLevel)
+    res.redirect("/")
+    }else{
+        res.redirect("/404")
+    }
+})
+router.get("/delete/:_id",isAuth,isCubeOwner,async(req,res)=>{
+    const cube = await cubeManager.getById(req.params._id);
+    res.render("delete",cube)
+})
+router.post("/delete/:_id",isAuth,isCubeOwner,async(req,res)=>{
+    await cubeManager.delete(req.params._id);
     res.redirect("/")
 })
 

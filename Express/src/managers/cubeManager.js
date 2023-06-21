@@ -1,14 +1,14 @@
 const Cube = require("../models/cube")
 
 
-exports.create=  function(name,description,imageUrl,difficultyLevel){
-     Cube.create({name,description,imageUrl,difficultyLevel})
+exports.create=  function(name,description,imageUrl,difficultyLevel,owner){
+    return Cube.create({name,description,imageUrl,difficultyLevel,owner})
 }
 exports.getAll= function(){
-    return Cube.find().lean();
+    return Cube.find();
 }
 exports.getById= function(id){
-    return Cube.findById(id).lean();
+    return Cube.findById(id);
 }
 exports.showSelectedOption= function(level){
     const options = [
@@ -24,4 +24,7 @@ exports.showSelectedOption= function(level){
 }
 exports.update =function (id,name, description ,imageUrl , difficultyLevel){
     return Cube.findByIdAndUpdate(id,{name, description ,imageUrl , difficultyLevel})
+}
+exports.delete = function(id){
+    return Cube.findByIdAndDelete(id);
 }

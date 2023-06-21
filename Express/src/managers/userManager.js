@@ -1,7 +1,8 @@
 const bcrypt = require("bcrypt")
-const {User} = require("../models/user");
+const User = require("../models/user");
 const jwt = require("../lib/jwt");
 const { mongoose } = require("mongoose");
+const { secret } = require("../middlewares/authMiddleware");
 
 
 exports.register = function(username,password,repass){
@@ -20,7 +21,7 @@ exports.login = async function(username,password){
         id:user._id,
         username:user.username
     }
-    const secret = "MYSECRET"
+
     const token = await jwt.sign(payload,secret)
     return token
 }
